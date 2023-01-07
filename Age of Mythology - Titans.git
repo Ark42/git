@@ -1,0 +1,117 @@
+# GIT Wizard script for Age of Mythology - Titans
+
+# Base common settings
+setvar sockets ""
+setvar ports "2299-2300 : AoM:Titans"
+setvar options OPT_FRAME_ETH2
+addflag options OPT_IPV4_SRCP
+addflag options OPT_IPV4_NORT
+addflag options OPT_OTHER_ARP
+addflag options OPT_COMP_ZLIB
+setvar packets 0
+setvar protos PROTO_UDP
+
+setvar heading "Important Information"
+setvar subheading "LAN configuration"
+addline control "label||In order for Age of Mythology - Titans to work with GIT, every LAN must be on the subnet and use the same subnet mask."
+appendstring control "  No computers or routers can share an IP address, and one computer on each LAN must run GIT and be able to map ports to it."
+appendstring control "  For example, if your LAN uses 192.168.0.1 for its router and your computers are 192.168.0.2 and 192.168.0.3, the other LAN must not use 192.168.0.1 through 192.168.0.3 at all."
+appendstring control "  The other LAN must be on the same 192.168.0.x subnet though, so the IP address of the router must be changed to something like 192.168.0.11 and the computers on that LAN can be numbered with 192.168.0.12 and 192.168.0.13."
+appendstring control "  If no LANs use NAT and every computer has a real IP address, you do not need GIT, since you can use the direct IP option in the game."
+appendstring control "  If any one LAN must use NAT, you will have to configure every LAN to use NAT with the same subnet and use GIT."
+appendstring control "  Beyond configuring each LAN as stated above, the only other thing you will need is the external IP address of each LAN."
+appendstring control "|15"
+showpage
+
+# Page Asking for IP + Ask for a list of all others
+loadvar externalhostname
+loadvar servhostlist
+removeblanklines servhostlist
+sortlines servhostlist
+setvar heading "Host/IP List"
+setvar subheading "Information to provide to other LANs."
+addline control "label||What is your external hostname or IP address?"
+addline control "text1|externalhostname||4"
+addline control "label||You must provide this information to the person running GIT on each LAN now."
+addline control "space|||2"
+addline control "textm|servhostlist|Enter the hostname or IP each other person provides, one per line, including your own:|8"
+addline control "label||Everybody running GIT must have the all of the same hostnames or IPs listed here."
+showpage
+savevar externalhostname
+removeblanklines servhostlist
+sortlines servhostlist
+savevar servhostlist
+
+setvar myhost externalhostname
+
+# Must have at least two listed
+numlines numhosts servhostlist 
+if numhosts < 2
+	cancel "You must list at least your own host and one other."
+endif
+
+# Figure out where in the list of hosts is ourself
+setvar myhostnum -1
+setvar i 0
+while i < numhosts
+	getline host servhostlist i
+	if host = myhost
+		setvar myhostnum i
+	endif
+	math i i + 1
+endwhile
+
+# Make sure they listed themselves
+if myhostnum < 0
+	cancel "Your own hostname or IP was not found in the list."
+endif
+
+# Loop through all the hosts and assign a port to each combination
+# Save all the ports/connections that involve ourself
+setvar port 213
+setvar hosts ""
+setvar portlist ""
+setvar i 0
+while i < numhosts
+	setvar j i
+	math j j + 1
+	while j < numhosts
+		setvar host ""
+		if i = myhostnum
+			getline host servhostlist j
+		endif
+		if j = myhostnum
+			getline host servhostlist i
+		endif
+		if host != ""
+			appendstring host ":"
+			appendstring host port
+			appendstring host METH_UDP
+			addline hosts host
+			addline portlist port
+		endif
+		math j j + 1
+		math port port + 1
+	endwhile
+	math i i + 1
+endwhile
+
+# Show a reminder page listing ports to map
+setvar heading "Reminder"
+setvar subheading "Ports to map"
+# Create a nice string out of the list of ports
+removeblanklines portlist
+numlines i portlist
+if i > 1
+	math i i - 1
+	getline port portlist i
+	prependstring port "and "
+	setline portlist i port
+endif
+joinlines portlist ", "
+addline control "label||Reminder: You must map port "
+appendstring control portlist
+appendstring control " from "
+appendstring control externalhostname
+appendstring control " to the computer running GIT.|2"
+showpage

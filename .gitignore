@@ -1,0 +1,6 @@
+Release
+Installers/*.exe
+*.ncb
+*.aps
+*.opt
+*.plg

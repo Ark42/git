@@ -1,0 +1,174 @@
+# GIT Wizard script for Warcraft II
+
+# It doesn't really matter if you are client or server
+# Just that there is only one GIT per LAN
+# But it's still better to re-use this wizard page
+
+# Standard Page about Client/Server
+loadvar clisrv
+setvar heading "Client or Server"
+setvar subheading "Please select if you are hosting or joining the game below."
+addline control "radio|clisrv|Please select one:|"
+appendstring control "|First Remote Client on my LAN"
+appendstring control "|Another Remote Client on my LAN"
+appendstring control "|Local Client"
+appendstring control "|The Server"
+addline control "space|||2"
+addline control "label||Select 'First Remote Client on my LAN' if the server hosted someplace else and you are the first or only client on your LAN."
+appendstring control " Only one person per LAN should select this option, the rest must select 'Another Remote Client on my LAN'."
+appendstring control " If the server is local on your own LAN, but not on your computer, select 'Local Client'."
+appendstring control " If you are the server, select 'The Server'.|5"
+showpage
+savevar clisrv
+
+# No need for GIT if another remote client
+if clisrv = 1
+	cancel "You do not need to run GIT as another remote client.  Only the first remote client needs to run GIT and you will be able to find the server."
+endif
+
+# No need for GIT if local client
+if clisrv = 2
+	cancel "You do not need to run GIT as a local client. You should be able to see the game server using the normal method."
+endif
+
+# Basic common settings
+setvar sockets "87c2 : Warcraft II"
+setvar ports ""
+setvar options OPT_FRAME_8022
+addflag options OPT_FRAME_8023
+setvar packets PACKET_IPX
+setvar protos 0
+
+# Standard Network Configuration page
+loadvar hostname
+loadvar firewall
+loadvar nat
+loadvar externalhostname
+setvar heading "Network Configuration"
+setvar subheading "Please enter your IP address information below."
+addline control "label||What is your hostname or IP address?"
+addline control "text1|hostname||4"
+addline control "label||Are you open to receive incoming connections or are you firewalled?"
+addline control "radio|firewall||4|Open|Firewalled"
+addline control "label||Do you have a direct connection to the Internet or are you using NAT?"
+addline control "radio|nat||4|Direct Connection|NAT"
+addline control "label||If you are using NAT, what is your external hostname or IP address?"
+addline control "text1|externalhostname||4"
+addline control "space|||3"
+addline control "specl||ipfwnat";
+showpage
+savevar hostname
+savevar firewall
+savevar nat
+savevar externalhostname
+
+# Page Providing IP + Ask for a list of all others
+loadvar servhostlist
+if nat = 0
+	setvar myhost hostname
+else
+	setvar myhost externalhostname
+endif
+if servhostlist !con myhost
+	addline servhostlist myhost
+endif
+removeblanklines servhostlist
+sortlines servhostlist
+setvar heading "Host/IP List"
+setvar subheading "Information to provide to other LANs."
+addline control "label||Reminder: Your external hostname or IP is:"
+addline control "textr|myhost||4"
+addline control "label||You must provide this information to the person running GIT on each LAN now."
+addline control "space|||2"
+addline control "textm|servhostlist|Enter the hostname or IP each other person provides, one per line, including your own:|8"
+addline control "label||Everybody running GIT must have the all of the same hostnames or IPs listed here."
+showpage
+removeblanklines servhostlist
+sortlines servhostlist
+savevar servhostlist
+
+# Must have at least two listed
+numlines numhosts servhostlist 
+if numhosts < 2
+	cancel "You must list at least your own host and one other."
+endif
+
+# Figure out where in the list of hosts is ourself
+setvar myhostnum -1
+setvar i 0
+while i < numhosts
+	getline host servhostlist i
+	if host = myhost
+		setvar myhostnum i
+	endif
+	math i i + 1
+endwhile
+
+# Make sure they listed themselves
+if myhostnum < 0
+	cancel "Your own hostname or IP was not found in the list."
+endif
+
+# Loop through all the hosts and assign a port to each combination
+# Save all the ports/connections that involve ourself
+setvar port 213
+setvar hosts ""
+setvar portlist ""
+setvar i 0
+while i < numhosts
+	setvar j i
+	math j j + 1
+	while j < numhosts
+		setvar host ""
+		if i = myhostnum
+			getline host servhostlist j
+		endif
+		if j = myhostnum
+			getline host servhostlist i
+		endif
+		if host != ""
+			appendstring host ":"
+			appendstring host port
+			appendstring host METH_UDP
+			addline hosts host
+			addline portlist port
+		endif
+		math j j + 1
+		math port port + 1
+	endwhile
+	math i i + 1
+endwhile
+
+# If firewalled, show a reminder page listing ports
+# NAT with no firewall implies DMZ, so the port should be open
+if firewall != 0
+
+	setvar heading "Reminder"
+	setvar subheading "Ports to map"
+
+	# Create a nice string out of the list of ports
+	removeblanklines portlist
+	numlines i portlist
+	if i > 1
+		math i i - 1
+		getline port portlist i
+		prependstring port "and "
+		setline portlist i port
+	endif
+	joinlines portlist ", "
+
+	if nat != 0
+		addline control "label||Reminder: Since you are using NAT, you must map port "
+		appendstring control portlist
+		appendstring control " from "
+		appendstring control externalhostname
+		appendstring control " to "
+		appendstring control hostname
+		appendstring control "|2"
+	else
+		addline control "label||Reminder: Since you are firewalled, you must be able to open access to incoming connections on port "
+		appendstring control portlist
+		appendstring control ".|2"
+	endif
+	showpage
+endif

@@ -1,0 +1,381 @@
+Gamer's Internet Tunnel Wizard Scripts
+
+------
+Basics
+------
+Files should be named *.git and placed in the location GIT is installed.
+Scripts are simple text files containing one command per line.  Each command
+can have zero or more parameters, each separated by whitespace.  The '#'
+character can be used for a comment that lasts until the end of the line.
+Commands and variables take the form [A-Za-z_][A-Za-z0-9_]* and parameters can
+typically be a variable name, a string, or an integer.  Strings start end end
+with double quotes (") and can contain two double quotes in a row to place one
+double quote in the string such as "hello ""world""" which represents the
+string hello "world".  Integers can prefixed with a minus sign (-) for negative
+numbers, or 0x to signify a hexadecimal number.
+
+
+--------
+Commands
+--------
+Each command is listed here along with the types of parameters it accepts.
+[var] means the parameter must be a variable name while [str] means the
+parameter can be anything that evaluates to a string (variables willl be
+evaluated and integers will be cast to strings). [int] means anything that
+evaluates to an integer. [sym] means a specific symbol from a list of choices
+is the only thing accepted for that parameter.  Unitialized variables will
+default to an empty string or the value 0 if referenced.
+
+setvar [var] [str/int]
+	Sets the variable to be equal to the second parameter.
+math [var] [int] [sym] [int]
+	Sets the variable equal to a math operation performed on the two
+	integers.  Valid operations are + - * / %
+addflag [var] [int]
+	Sets a bit flag or flags in the variable.  Basically like |= in C.
+removeflag [var] [int]
+	Removes a bit flag or flags in the variable. Like &=~ in C.
+prependstring [var] [str]
+	Adds on the string at the beginning of the variable.
+appendstring [var] [str]
+	Adds on the string to the end of the variable.
+findstring [var] [str] [str] [int]
+	Searches in the first string for the second string, starting at the
+	position specified by the integer and stores the result in the
+	variable. Positions are 0-based and the variable is set to -1 if no
+	match is found.
+reversefindstring [var] [str] [str] [int]
+	Like findstring, but searches backwards from the end of the string.
+stringlength [var] [str]
+	Sets the variable to be the integer value of the length of the string.
+substring [var] [str] [int] [int]
+	Sets the variable to be a piece of the string starting at the position
+	specified by the first integer and with a maximum length specified by
+	the second integer, which can be -1 to mean the rest of the string.
+numlines [var] [str]
+	Sets the variable to be the number of lines in the string.
+getline [var] [str] [int]
+	Sets the variable to be one line from the string as specified by the
+	integer.  The lines are numbered starting with 0.
+setline [var] [int] [str]
+	Overwrites a line in the variable specified by the integer with the
+	contents of the string.  Will append a new line for the string if the
+	integer does not specify a valid line number.
+addline [var] [str]
+	Adds a new line to the end of the variable and appends the string on
+	that new line.
+deleteline [var] [int]
+	Removes a line from the variable as specified by the integer.  Will do
+	nothing if the line does not exist.
+sortlines [var]
+	Sorts all of the lines in the variable.
+splitlines [var] [str]
+	Splits up a variable into numerous lines delimited by the string.
+joinlines [var] [str]
+	Joins all of the lines in the variable into one big line, placing a copy
+	of the string between each piece.
+removeblanklines [var]
+	Deletes all of the blank lines from the variable.
+if [str/int] [sym] [str/int]
+	Compares two strings or two integers to control script flow.
+	If either value is a string, both will be treated like strings.
+	Valid operations are = < > <= >= con
+	Operations can be prefixed with a ! to negate the results.
+	The con operator for integers is used to test of the first integer
+	contains all of the bit flags of the second integer.
+	The < > <= and >= operators for strings compare the strings sort order.
+	The con operator for strings is used to determine if the first string
+	contains the second string.
+elseif [str/int] [sym] [str/int]
+	Works like if, but there can be any number of these.  Only the first
+	true elseif block is executed, and only if the if block wasn't executed.
+else
+	The last choice if none of the if's or elseif's were true.
+	There can be only one of these per if block.
+endif
+	Marks the end of the if/elseif/else block.
+	All if's must have a corresponding endif.
+while [str/int] [sym] [str/int]
+	Works like if to test for true or false, but will loop through the
+	block until the test is false.
+endwhile
+	Marks the end of the while block.  Execution jumps back up to the
+	corresponding while and the test is repeated.
+loadvar [var]
+	Loads a variable's value from the registry.  The value is loaded as
+	soon as it is requested by executing the loadvar command. Wizard script
+	variables can be stored in HKCU\Software\Git\Wizard
+	Loadvar will check the savevar temporary holding spot and load from that
+	if it exists before actually loading from the registry.  This allows
+	loadvar/savevar/showpage to work together nicely.
+savevar [var]
+	Saves a variable's value into a temporary holding spot.  The variable
+	is only actually saved to the registry if the script completes
+	successfully by way of the finish command.  The value saved is the
+	value the variable had at the time the savevar command was executed.
+	When using loadvar/savevar, your settings can be shared with other
+	scripts, so if you use the same variable name as another script, please
+	make sure it has exactly the same meaning in both scripts.
+showpage
+	Shows the wizard dialog page.  See the Dialog Controls section for how
+	to configure the wizard page controls.
+	Pressing the back button on the page will cause the execution point in
+	the script to jump back to the line after the previous showpage that was
+	executed, or the beginning of the script if only one showpage had been
+	executed so far.  Pressing the back button on the first page will cause
+	the wizard to start completely over and clear all variables.
+finish {[str]}
+	Shows the final wizard dialog page, with the finish button. The
+	optional string parameter will be displayed as a label on the finish
+	page along with a message about which button to press.  If the user
+	picks the finish button then the savevar variables will be stored, and
+	and special variables will be configured and the GIT tunnel will be
+	restarted with the new settings.
+cancel {[str]}
+	Shows a wizard page with only a cancel button and allows an optional
+	message to be displayed on a label.  This forces the user to abandon
+	all choices made so far and is used when the choices made cannot
+	work for the program the script is trying to configure GIT for.
+
+
+-----------------
+Special Variables
+-----------------
+There are several types of special variables in GIT wizard scripts.
+Dialog Control variables are described below, in their own section.
+
+Configuration variables are used to alter GIT settings and will be pre-set
+with the current GIT setting values when the script starts.
+Integer configuration variables:
+	device - The packet device selected from the 0 based index of choices.
+	multiport - For port number to use for TCP multi-listen mode.
+	multimax - The max number of connections to accept for TCP multi-listen.
+Flag configuration variables:
+	options - General program options.
+	packets - Which types of IPX packets to forward.
+	protos - Which types of IPv4 protocols to forward.
+String configuration variables:
+	natinternal - The internal hostname/IP if using Alter Source IP
+	natexternal - The external hostname/IP if using Alter Source IP
+Multiline configuration variables:
+	hosts - The list of hosts to connect/listen to, one per line.
+	sockets - The list of IPX socket ranges to forward.
+	ports - The list of TCP/UDP port ranges to forward.
+
+Flag bit variables are used for the flag configuration variables as shortcuts
+to the various bits' meanings.
+Flags for options:
+	OPT_FRAME_8022 - Look into IEEE 802.2 frames
+	OPT_FRAME_8023 - Look into IEEE 802.3 (Novall "raw") frames
+	OPT_FRAME_ETH2 - Look into Ethernet II frames
+	OPT_FRAME_SNAP - Look into Ethernet SNAP frames
+	OPT_IPV4_NOUC - Don't Send Unicast IPv4 Option
+	OPT_IPV4_NAT - Alter Source IP (for NAT) IPv4 Option
+	OPT_IPV4_NOBC - Don't Send Broadcast IPv4 Option
+	OPT_IPV4_SRCP - Also Match Source Port IPv4 Option
+	OPT_IPV4_NORT - Don't Send Routable IPv4 Option
+	OPT_TCP_MULTI - Be TCP multi-listen server instead
+	OPT_OTHER_ARP - Forward ARP Other Option
+	OPT_OTHER_ORFP - Use Old Reforward Prevention Method for IPX/IPv4 Frames
+	OPT_COMP_ZLIB - Use ZLib Compression
+Flags for packets:
+	PACKET_OLD - Forward NLSP / Old IPX packets
+	PACKET_RIP - Forward RIP IPX packets
+	PACKET_ECO - Forward Echo IPX packets
+	PACKET_ERR - Forward Error IPX packets
+	PACKET_IPX - Forward IPX normal packets
+	PACKET_SPX - Forward SPX / SPX II packets
+	PACKET_NCP - Forward NCP IPX packets
+	PACKET_NTB - Forward NetBIOS IPX packets
+Flags for protos:
+	PROTO_ICMP - Forward IPv4 ICMP protocol
+	PROTO_TCP - Forward IPv4 TCP protocol
+	PROTO_UDP - Forward IPv4 UDP protocol
+
+String helper variables contain shortcut strings to ensure script writers
+do not have to use strings that the configuration variables expect to be spelled
+perfectly.
+String helpers for hosts, contain a space followed by a word in ()
+	METH_UDP - Host method UDP
+	METH_TCP_LISTEN - Host method TCP listen
+	METH_TCP_CONNECT - Host method TCP connect
+	METH_TCP_CONNECT_SOCKS4 - Host method TCP connect using socks4
+	METH_TCP_CONNECT_SOCKS5 - Host method TCP connect using socks5
+
+Pre-set variables are not really special, but are set by the first wizard page
+and can be used if the script writer wants to use them.
+	scripts - Contains a list of all script choices, one per line.
+	scriptcontrol - The text used to display the script dropdown control
+		(or label, if a .git file was loaded externally).
+	script - The integer index of the script from the list that was
+		selected from the dropdown.
+	scriptname - The name of the script that was selected.  This should be
+		the name of the program that the script is trying to configure
+		GIT for.
+	devices - Contains a list of all the available network packet devices.
+	devicecontrol - The text used to display the device dropdown control.
+	device - The integer index of the device that was selected. This
+		variable is also a special configuration variable.
+
+
+---------------
+Dialog Controls
+---------------
+The contents of the special variables called 'heading' and 'subheading' are
+placed in the white area at the top of the wizard page.  The special variable
+called 'control' is used to add controls to the wizard page.
+Each line of the string in 'control' represents one control.
+Each line has several parameters, delimited by a '|' character.
+Parameter 1: Control type
+Parameter 2: Variable name to bind control data to
+Parameter 3: Text label for the control
+Parameter 4: Control size
+Parameter 5+: Item choices
+Parameters can be omitted and a sane default will be used. Parameters may also
+contain whitespace on the left or right sides of the text which will be trimmed
+off when parsing the control variable.
+The control variable as well as the heading and subheading are cleared after a
+call to showpage.
+
+Blank Space
+-----------
+Control: space 
+Variable: Unused
+Text: Unused
+Size: Amount of vertical space to skip, in 1/2 line units.  There are 18 usable
+	lines (36 1/2 lines) of space on the wizard page.
+Choices: Unused
+
+Text Label
+----------
+Control: label
+Variable: The text of the label will be overwritten with the contents of this
+	variable, if a variable is specified.
+Text: Text to display.
+Size: Number of lines of text to reserve.
+Choices: Unused
+
+Checkbox
+--------
+Control: check
+Variable: Integer (0 or 1)
+Text: Displayed to the right of the checkbox on the same line.
+Size: Unused
+Choices: Unused
+
+Radio Buttons
+-------------
+Control: radio
+Variable: Integer (0 to the number of choices-1)
+Text: Displayed to the left of the radio buttons
+Size: Number of columns to divide up the space into.  Radio buttons will wrap
+	around to the next line as needed, if there are more choices then
+	columns.  The text label will take up the same amount of space as a
+	single radio choice, unless it is omitted or blank.
+Choices: One per radio button
+
+Dropdown Box
+------------
+Control: dropd
+Variable: Integer (0 to the number of choices-1)
+Text: Displayed to the left of the dropdown using all but the last column
+Size: Number of columns to divide up the space into.  The dropdown will take up
+	only the first column if the text is omitted or blank, otherwise the
+	dropdown will take up only the last column.
+Choices: Displayed in a list of the dropdown, one per line.
+
+Combo Box
+---------
+Control: combo
+Variable: String
+Text: Displayed to the left of the combo box using all but the last column
+Size: Number of columns to divide up the space into.  The combo box will take up
+	only the first column if the text is omitted or blank, otherwise the
+	combo box will take up only the last column.
+Choices: Displayed in a list of the combo box, one per line.
+
+Text Box
+--------
+Control: text1
+Variable: String
+Text: Displayed to the left of the text box using all but the last column
+Size: Number of columns to divide up the space into.  The text box will take up
+	only the first column if the text is omitted or blank, otherwise the
+	text box will take up only the last column.
+Choices: Unused
+
+Read-only Text
+--------------
+Control: textr
+Variable: String (Read into textbox, not stored back into variable though)
+Text: Displayed to the left of the text box using all but the last column
+Size: Number of columns to divide up the space into.  The text box will take up
+	only the first column if the text is omitted or blank, otherwise the
+	text box will take up only the last column.
+Choices: Unused
+
+Multiline Text
+--------------
+Control: textm
+Variable: String
+Text: Displayed on a line above the multiline text box, unless omitted or blank.
+Size: Maximum number of lines of text the user will be able to type.
+Choices: Unused
+
+Horizonal Line
+--------------
+Control: hline
+Variable: Unused
+Text: Unused
+Size: Unused
+Choices: Unused
+
+Special Controls
+----------------
+Control: specl
+Variable: Unused
+Text: Determines what type of special control to add. Currently the choices
+	are autoconf, saveprof, and ipfwnat.
+	'autoconf' will display a button used to skip all calls to showpage,
+	unless a call to loadvar fails.  This button is placed on the first
+	wizard page automatically.  Using this allows scripts use saveval to
+	save important settings to the registry and later use loadval to load
+	these settings.  As long as all loadval's succeed, the script can be
+	ran without any more user intervention, to prevent asking the user
+	questions they answered the first time they ran the script.
+	'saveprof' will display a button used to automatically write a short
+	.git wizard script that just resets the current settings. This allows
+	users to customize profiles that can quickly restore with the wizard.
+	'ipfwnat' will display a button used to guess the user's IP address
+	information.  This button will alter the objects on the wizard page
+	numbered 1, 3, 4, 6, and 7. Each control other then specl generates one
+	or more objects numbered incrementally starting at 0.
+Size: Unused
+Choices: Unused
+
+
+-------
+Example
+-------
+# This script will display the Network Configuration wizard page
+loadvar hostname
+loadvar firewall
+loadvar nat
+loadvar externalhostname
+setvar heading "Network Configuration"
+setvar subheading "Please enter your IP address information below."
+addline control "label||What is your hostname or IP address?"
+addline control "text1|hostname||4"
+addline control "label||Are you open to receive incoming connections or are you firewalled?"
+addline control "radio|firewall||4|Open|Firewalled"
+addline control "label||Do you have a direct connection to the Internet or are you using NAT?"
+addline control "radio|nat||4|Direct Connection|NAT"
+addline control "label||If you are using NAT, what is your external hostname or IP address?"
+addline control "text1|externalhostname||4"
+addline control "space|||3"
+addline control "specl||ipfwnat";
+showpage
+savevar hostname
+savevar firewall
+savevar nat
+savevar externalhostname

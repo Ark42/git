@@ -1,0 +1,368 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ENABLED             ICON    DISCARDABLE     "git_en.ico"
+IDI_DISABLED            ICON    DISCARDABLE     "git_dis.ico"
+IDI_SHUTDOWN            ICON    DISCARDABLE     "git_down.ico"
+IDI_STARTUP             ICON    DISCARDABLE     "git_up.ico"
+IDI_WIZARD              ICON    DISCARDABLE     "git_wiz.ico"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_TRAY MENU DISCARDABLE 
+BEGIN
+    POPUP "."
+    BEGIN
+        MENUITEM "Gamer's Internet Tunnel by Ark v0.99b4", ID_TRAY_TITLE
+        , GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Go to GIT Support Forum",     ID_TRAY_SUPPORT
+        MENUITEM "Go to GIT Homepage",          ID_TRAY_HOMEPAGE
+        MENUITEM "View README file",            ID_TRAY_README
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_TRAY_EXIT
+        MENUITEM "Hide Tray Icon",              ID_TRAY_HIDE
+        MENUITEM SEPARATOR
+        MENUITEM "Wizard",                      ID_TRAY_WIZARD
+        MENUITEM "Configuration",               ID_TRAY_CONFIGURE
+        MENUITEM "Advanced Configuration",      ID_TRAY_ADVCFG
+        POPUP "Logging"
+        BEGIN
+            MENUITEM "Log Incoming Packets",        ID_TRAY_LOG_IN
+            MENUITEM "Log Forwarded Packets",       ID_TRAY_LOG_FWD
+            MENUITEM "Log Unforwarded Packets",     ID_TRAY_LOG_UNFWD
+            MENUITEM "Log Invalid Connections",     ID_TRAY_LOG_ADDR
+        END
+        MENUITEM "Connection Status",           ID_TRAY_STATUS
+        MENUITEM SEPARATOR
+        POPUP "Autorun on Startup"
+        BEGIN
+            MENUITEM "Do not Autorun",              ID_TRAY_AUTORUN_DONT
+            , CHECKED
+            MENUITEM "Autorun in Tray",             ID_TRAY_AUTORUN_TRAY
+            MENUITEM "Autorun Hidden",              ID_TRAY_AUTORUN_HIDDEN
+        END
+        MENUITEM "Tunnel Enabled",              ID_TRAY_ENABLED, CHECKED
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_CONFIGURE DIALOG DISCARDABLE  0, 0, 317, 223
+STYLE DS_MODALFRAME | DS_NOIDLEMSG | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Gamer's Internet Tunnel Configuration"
+FONT 8, "Tahoma"
+BEGIN
+    GROUPBOX        "Forward to what hosts?",IDC_STATIC,8,4,164,212
+    RTEXT           "&Host or IP:",IDC_STATIC,16,16,48,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_HOST,68,16,96,12,ES_AUTOHSCROLL
+    RTEXT           "&Port number:",IDC_STATIC,16,32,48,12,SS_CENTERIMAGE
+    COMBOBOX        IDC_PORT,68,32,96,48,CBS_DROPDOWN | WS_VSCROLL | 
+                    WS_TABSTOP
+    RTEXT           "Using &method:",IDC_STATIC,16,48,48,12,SS_CENTERIMAGE
+    COMBOBOX        IDC_METH,68,48,96,56,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Add",IDC_ADDHOST,16,64,56,16
+    PUSHBUTTON      "&Remove",IDC_REMOVEHOST,108,64,56,16
+    LISTBOX         IDC_HOSTS,16,84,148,76,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Be &TCP listen server and accept all connections on the same port from any host instead.",
+                    IDC_TCPMULTI,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
+                    WS_TABSTOP,16,168,148,24
+    LTEXT           "Max connections:",IDC_STATIC,16,196,60,12,
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_MAXCONN,76,196,24,12,ES_AUTOHSCROLL | WS_DISABLED
+    GROUPBOX        "Forward which IPX &sockets?",IDC_STATIC,176,4,136,92
+    COMBOBOX        IDC_SOCKET,184,16,120,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "A&dd",IDC_ADDSOCKET,184,32,56,16
+    PUSHBUTTON      "R&emove",IDC_REMOVESOCKET,248,32,56,16
+    LISTBOX         IDC_SOCKETS,184,52,120,36,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "&Forward which TCP/UDP ports?",IDC_STATIC,176,104,136,
+                    92
+    COMBOBOX        IDC_PORTC,184,116,120,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Add",IDC_ADDPORT,184,132,56,16
+    PUSHBUTTON      "Remo&ve",IDC_REMOVEPORT,248,132,56,16
+    LISTBOX         IDC_PORTS,184,152,120,36,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&OK",IDC_OK,176,200,56,16
+    PUSHBUTTON      "&Cancel",IDCANCEL,256,200,56,16
+END
+
+IDD_ADVCFG DIALOG DISCARDABLE  0, 0, 369, 228
+STYLE DS_MODALFRAME | DS_NOIDLEMSG | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Gamer's Internet Tunnel Advanced Configuration"
+FONT 8, "Tahoma"
+BEGIN
+    GROUPBOX        "Look at frames on which &device?",IDC_STATIC,8,4,356,32
+    COMBOBOX        IDC_DEVICE,16,16,340,76,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Look into which &frame types?",IDC_STATIC,8,40,116,64
+    CONTROL         "IEEE 802.2",IDC_FRAME_8022,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,16,52,100,12
+    CONTROL         "IEEE 802.3 (Novell ""raw"")",IDC_FRAME_8023,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,16,64,100,12
+    CONTROL         "Ethernet II",IDC_FRAME_ETH2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,16,76,100,12
+    CONTROL         "Ethernet SNAP",IDC_FRAME_SNAP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,16,88,100,12
+    GROUPBOX        "Forward which IP&X packet types?",IDC_STATIC,128,40,116,
+                    64
+    CONTROL         "IPX",IDC_PACKET_IPX,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,136,52,68,12
+    CONTROL         "NLSP / Old IPX",IDC_PACKET_OLD,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,136,64,68,12
+    CONTROL         "SPX / SPX II",IDC_PACKET_SPX,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,136,76,68,12
+    CONTROL         "NetBIOS",IDC_PACKET_NTB,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,136,88,68,12
+    CONTROL         "Echo",IDC_PACKET_ECO,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,208,52,32,12
+    CONTROL         "Error",IDC_PACKET_ERR,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,208,64,32,12
+    CONTROL         "RIP",IDC_PACKET_RIP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,208,76,32,12
+    CONTROL         "NCP",IDC_PACKET_NCP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,208,88,32,12
+    GROUPBOX        "IPv4 Forward O&ptions",IDC_STATIC,248,40,116,160
+    CONTROL         "Also Match Source Port",IDC_OPT_SRCP,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,256,52,96,12
+    CONTROL         "",IDC_STATIC,"Static",SS_GRAYFRAME,256,68,100,1
+    CONTROL         "Don't Send Unicast",IDC_OPT_NOUC,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,256,88,96,12
+    CONTROL         "Don't Send Broadcast",IDC_OPT_NOBC,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,256,100,96,12
+    CONTROL         "Don't Send Routable",IDC_OPT_NORT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,256,112,96,12
+    CONTROL         "Alter Source IP (for NAT):",IDC_OPT_NAT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,256,136,96,12
+    LTEXT           "From Hostname (Internal):",IDC_STATIC,256,149,92,8,
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_OPT_NAT_INT,256,157,100,12,ES_AUTOHSCROLL
+    LTEXT           "To Hostname (External):",IDC_STATIC,256,173,92,8,
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_OPT_NAT_EXT,256,181,100,12,ES_AUTOHSCROLL
+    GROUPBOX        "O&ther Options",IDC_STATIC,8,108,116,60
+    CONTROL         "Forward ARP",IDC_OTHER_ARP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,16,121,104,12
+    CONTROL         "Old Reforward Prevention Method for IPX/IPv4",
+                    IDC_OTHER_ORFP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
+                    WS_TABSTOP,16,132,104,20
+    CONTROL         "ZLib Compression",IDC_COMP_ZLIB,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,16,152,104,12
+    GROUPBOX        "Forward which &IPv4 protocols?",IDC_STATIC,128,108,116,
+                    60
+    CONTROL         "TCP",IDC_PROTO_TCP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,136,121,40,12
+    CONTROL         "UDP",IDC_PROTO_UDP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,136,132,40,12
+    CONTROL         "ICMP",IDC_PROTO_ICMP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,136,144,40,12
+    GROUPBOX        "&Socks Proxy Server",IDC_STATIC,8,172,236,48
+    LTEXT           "Hostname:",IDC_STATIC,16,185,36,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_SOCKSHOST,52,185,108,12,ES_AUTOHSCROLL
+    RTEXT           "Port: ",IDC_STATIC,170,185,22,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_SOCKSPORT,192,185,40,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Username:",IDC_STATIC,16,201,36,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_SOCKSUSER,52,201,96,12,ES_AUTOHSCROLL
+    RTEXT           "Password: ",IDC_STATIC,156,201,36,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_SOCKSPASS,192,201,40,12,ES_PASSWORD | ES_AUTOHSCROLL
+    PUSHBUTTON      "&OK",IDC_OK,248,204,56,16
+    PUSHBUTTON      "&Cancel",IDCANCEL,308,204,56,16
+END
+
+IDD_STATUS DIALOGEX 0, 0, 175, 39
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_NOIDLEMSG | DS_SETFOREGROUND | 
+    DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Please wait..."
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    LTEXT           "Shutting down packet device and sockets in order to update configuration options.  They will restart and reconnect automatically in a moment.",
+                    IDC_STATIC,7,7,161,26
+END
+
+IDD_CONNSTAT DIALOG DISCARDABLE  0, 0, 328, 225
+STYLE DS_MODALFRAME | DS_NOIDLEMSG | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Connection Status"
+FONT 8, "Tahoma"
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,268,204,56,16
+    EDITTEXT        IDC_CONNTEXT,4,4,320,196,ES_MULTILINE | ES_AUTOVSCROLL | 
+                    ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    PUSHBUTTON      "&Refresh",IDC_REFRESH,4,204,56,16
+    CONTROL         "View Known &Remote Host List",IDC_HWSRCLIST,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,68,208,132,12
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_CONFIGURE, DIALOG
+    BEGIN
+        RIGHTMARGIN, 230
+        BOTTOMMARGIN, 222
+    END
+
+    IDD_ADVCFG, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 192
+    END
+
+    IDD_STATUS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 168
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 32
+    END
+
+    IDD_CONNSTAT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 321
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 218
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,99,4,0
+ PRODUCTVERSION 0,99,4,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "http://www.morpheussoftware.net/git/\0"
+            VALUE "CompanyName", "Morpheus Software\0"
+            VALUE "FileDescription", "Gamer's Internet Tunnel\0"
+            VALUE "FileVersion", "0.99 BETA 4\0"
+            VALUE "InternalName", "GIT\0"
+            VALUE "LegalCopyright", "Copyright © 2001-2004\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "git.exe\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "GIT\0"
+            VALUE "ProductVersion", "0.99 BETA 4\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// 24
+//
+
+IDR_MANIFEST            24      DISCARDABLE     "XP-Manifest.xml"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

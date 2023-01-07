@@ -1,0 +1,103 @@
+# GIT Wizard script Generic TCP or UDP game
+
+# Base common settings
+setvar sockets "0000-ffff : All sockets"
+setvar ports ""
+setvar options OPT_FRAME_8022
+addflag options OPT_FRAME_8023
+addflag options OPT_COMP_ZLIB
+setvar packets PACKET_IPX
+setvar protos 0
+
+# Page Asking for IP + Ask for a list of all others
+loadvar externalhostname
+loadvar servhostlist
+removeblanklines servhostlist
+sortlines servhostlist
+setvar heading "Host/IP List"
+setvar subheading "Information to provide to other LANs."
+addline control "label||What is your external hostname or IP address?"
+addline control "text1|externalhostname||4"
+addline control "label||You must provide this information to the person running GIT on each LAN now."
+addline control "space|||2"
+addline control "textm|servhostlist|Enter the hostname or IP each other person provides, one per line, including your own:|8"
+addline control "label||Everybody running GIT must have the all of the same hostnames or IPs listed here."
+showpage
+savevar externalhostname
+removeblanklines servhostlist
+sortlines servhostlist
+savevar servhostlist
+
+setvar myhost externalhostname
+
+# Must have at least two listed
+numlines numhosts servhostlist 
+if numhosts < 2
+	cancel "You must list at least your own host and one other."
+endif
+
+# Figure out where in the list of hosts is ourself
+setvar myhostnum -1
+setvar i 0
+while i < numhosts
+	getline host servhostlist i
+	if host = myhost
+		setvar myhostnum i
+	endif
+	math i i + 1
+endwhile
+
+# Make sure they listed themselves
+if myhostnum < 0
+	cancel "Your own hostname or IP was not found in the list."
+endif
+
+# Loop through all the hosts and assign a port to each combination
+# Save all the ports/connections that involve ourself
+setvar port 213
+setvar hosts ""
+setvar portlist ""
+setvar i 0
+while i < numhosts
+	setvar j i
+	math j j + 1
+	while j < numhosts
+		setvar host ""
+		if i = myhostnum
+			getline host servhostlist j
+		endif
+		if j = myhostnum
+			getline host servhostlist i
+		endif
+		if host != ""
+			appendstring host ":"
+			appendstring host port
+			appendstring host METH_UDP
+			addline hosts host
+			addline portlist port
+		endif
+		math j j + 1
+		math port port + 1
+	endwhile
+	math i i + 1
+endwhile
+
+# Show a reminder page listing ports to map
+setvar heading "Reminder"
+setvar subheading "Ports to map"
+# Create a nice string out of the list of ports
+removeblanklines portlist
+numlines i portlist
+if i > 1
+	math i i - 1
+	getline port portlist i
+	prependstring port "and "
+	setline portlist i port
+endif
+joinlines portlist ", "
+addline control "label||Reminder: If you are running a firewall or using NAT, you must map port "
+appendstring control portlist
+appendstring control " from "
+appendstring control externalhostname
+appendstring control " to the computer running GIT.|2"
+showpage
